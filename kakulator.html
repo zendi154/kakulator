@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Kakulator Moderen</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        /* Reset dasar */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #323232e5;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #ebeef0;
+        }
+
+        #formNakes {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Kontainer utama */
+        main {
+            flex: 1;
+            padding-bottom: 2rem;
+            /* agar tidak tertabrak footer saat scroll */
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            background: #007bff;
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+            padding: 1rem 2rem;
+            text-align: center;
+            letter-spacing: 1.5px;
+            box-shadow: 0 2px 5px rgb(0 123 255 / 0.4);
+            z-index: 1000;
+            /* supaya selalu di atas */
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 2rem auto 4rem;
+            background: white;
+            border-radius: 10px;
+            padding: 2rem 3rem;
+            box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+        }
+
+        /* Heading */
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #222;
+        }
+
+        .form-group {
+            border: 1px solid #ccc;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            max-width: 500px;
+        }
+
+        .form-group>div {
+            margin-bottom: 12px;
+        }
+
+        .form-group>div:first-child {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="time"],
+        .form-group select {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 15px;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="time"]:focus,
+        .form-group select:focus {
+            border-color: #007bff;
+            outline: none;
+            background-color: #fff;
+        }
+
+        /* Kalau kamu mau tombol tambahNakes dan form lebih rapih */
+        #formNakes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Responsif (mobile) */
+        @media (max-width: 600px) {
+            .form-group>div {
+                flex: 1 1 100%;
+            }
+
+            .form-group label {
+                width: 110px;
+                text-align: left;
+            }
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            user-select: none;
+        }
+
+        input[type="date"],
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 0.6rem 1rem;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+            outline-offset: 2px;
+        }
+
+        input[type="date"]:focus,
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 6px #007bffaa;
+        }
+
+        /* Button styling */
+        button {
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.4rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            margin-right: 1rem;
+            box-shadow: 0 4px 10px rgb(0 123 255 / 0.4);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            user-select: none;
+        }
+
+        button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Loading text */
+        #loading {
+            color: #ff6600;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        /* Total honor text */
+        #totalHonorText {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #28a745;
+        }
+
+        /* Filter Box Container tetap sama */
+        .filter-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin: 1.5rem auto;
+            max-width: 1000px;
+        }
+
+        .filter-container h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        /* Filter row style */
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: space-between;
+        }
+
+        /* Ubah form-group jadi flex row */
+        .filter-row .form-group {
+            flex: 1 1 45%;
+            display: flex;
+            align-items: center;
+            /* vertical center */
+            gap: 1rem;
+        }
+
+        /* Label dibuat lebar tetap agar sejajar rapi */
+        .filter-row label {
+            width: 140px;
+            /* sesuaikan dengan kebutuhan */
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 0;
+            /* hapus margin bawah karena sudah sejajar */
+        }
+
+        /* Select isi full sisa ruang */
+        .filter-row select {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        /* Responsif HP: stack vertikal lagi */
+        @media (max-width: 600px) {
+            .filter-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filter-row .form-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-row label {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .filter-row select {
+                width: 100%;
+                flex: none;
+            }
+
+            .filter-container {
+                padding: 1rem;
+                margin: 1rem;
+            }
+        }
+
+
+        /* Horizontal line */
+        hr {
+            margin: 2rem 0;
+            border: none;
+            border-top: 1.5px solid #ddd;
+        }
+
+        .container-hasil {
+            margin: 40px auto;
+            padding: 20px;
+            max-width: 100%;
+            background-color: #fdfdfd;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container-hasil h3 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        #hasilTable {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        #hasilTable th,
+        #hasilTable td {
+            border: 1px solid #ddd;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        #hasilTable th {
+            background-color: #007bff;
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        #hasilTable tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #hasilTable tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+
+        /* Responsif */
+
+        /* Tablet (min-width 600px) */
+        @media (min-width: 600px) {
+
+            .form-group,
+            label+select {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .form-group label {
+                width: 220px;
+                margin-bottom: 0;
+                padding-right: 1rem;
+                text-align: right;
+            }
+
+            label+select {
+                margin-right: 2rem;
+                margin-bottom: 0;
+            }
+        }
+
+        /* Mobile (max-width 599px) */
+        @media (max-width: 599px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+                text-align: center;
+            }
+
+            button {
+                width: 100%;
+                margin: 0.4rem 0;
+            }
+
+            label+select {
+                width: 100%;
+                margin: 0.5rem 0 1rem 0;
+                min-width: auto;
+            }
+
+            .form-group label {
+                margin-bottom: 0.4rem;
+                text-align: left;
+                width: 100%;
+                padding-right: 0;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container-hasil {
+                padding: 15px;
+            }
+
+            #hasilTable th,
+            #hasilTable td {
+                font-size: 12px;
+                padding: 10px 6px;
+            }
+        }
+
+        /* Aksi tombol dalam tabel */
+        table button {
+            background: #6457f8;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            box-shadow: none;
+            margin: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        table button:hover {
+            background: #a71d2a;
+        }
+
+        /* Footer */
+        footer {
+            background: #222;
+            color: #ccc;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.85rem;
+            user-select: none;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        Kakulator Moderen
+    </nav>
+    <div class="container">
+        <h2><i class="fas fa-clipboard-list"></i> Pembagian Hasil Dinas P, S, M, Tenaga Kesehatan RSUD Tais <br> Ruangan
+            Kebidanan</h2>
+        <hr>
+        <p><i class="fas fa-info-circle"></i> <em>Pembagian berdasarkan status dinas & jumlah jam kerja nakes</em></p>
+        <br>
+        <hr>
+        <div class="form-group">
+            <label>-Nominal Penerimaan Bpjs :</label>
+            <label for="totalHonor"></label>
+            <input id="totalHonor" oninput="handleHonorInput(this)" placeholder="Masukkan Hanya Angka..." />
+        </div>
+        <hr>
+        <p><strong><i class="fas fa-coins"></i> Total Insentif Terbagi:</strong> <span id="totalHonorText">Rp0</span>
+        </p>
+        <hr>
+        <div class="form-group">
+            <label>-Tanggal Penerimaan Bpjs :</label>
+            <label for="tanggalHonor"></label>
+            <input type="date" id="tanggalHonor" required />
+        </div>
+        <hr>
+        <div class="button-group">
+            <button onclick="tambahNakes()"><i class="fas fa-user-plus"></i> Tambah Nakes</button>
+            <button onclick="hitungHonor()"><i class="fas fa-calculator"></i> Hitung/Simpan</button>
+            <button id="batalEdit" onclick="batalEdit()" style="display:none;"><i class="fas fa-times-circle"></i>
+                Batal</button>
+            <button onclick="eksporPDF()"><i class="fas fa-file-pdf"></i> Ekspor PDF</button>
+            <button onclick="eksporExcel()"><i class="fas fa-file-excel"></i>Ekspor Excel</button>
+        </div><br>
+
+        <hr>
+
+        <div id="formNakes"></div>
+
+        <hr>
+
+        <p id="loading" style="display:none"><i class="fas fa-spinner fa-spin"></i> Menghitung pembagian Insentif, mohon
+            tunggu...</p>
+
+        <br>
+        <div class="filter-container">
+            <h3><i class="fas fa-filter"></i> Filter Data Honor Nakes</h3>
+            <div class="filter-row">
+                <div class="form-group">
+                    <label for="filterBulan"><i class="fas fa-calendar-alt"></i> Pilih Bulan</label>
+                    <select id="filterBulan" onchange="filterBulanTahun()">
+                        <option value="">Semua Bulan</option>
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                </div>
+
+                <hr>
+
+                <div class="form-group">
+                    <label for="filterTahun"><i class="fas fa-calendar"></i> Pilih Tahun</label>
+                    <select id="filterTahun" onchange="filterBulanTahun()">
+                        <option value="">Semua Tahun</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="container-hasil">
+            <h3>📋 Table Data Hasil Pembagian Insentif Rsud Tais Ruangan Kebidanan</h3>
+            <div class="table-wrapper">
+                <table id="hasilTable" style="display:none">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>ID Inputan Data </th>
+                            <th>Nama Nakes</th>
+                            <th>Jadwal Dinas</th>
+                            <th>Dari Pukul (Wib)</th>
+                            <th>Sampai Pukul (Wib)</th>
+                            <th>Hitungan Jam</th>
+                            <th>Persentase (%)</th>
+                            <th>Total Pembagian</th>
+                            <th>Tanggal Penerimaan (BPJS)</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            </main>
+            <hr>
+            <footer>
+                &copy; 2025 Provinder : Zendi Afrian Saputra,S.H | &copy; 2024 Disigen By : BlackswanPictured | Hak
+                Cipta Dilindungi
+                Undang-Undang
+            </footer>
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+            <script
+                src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</body>
+
+<script>
+    let nakesData = JSON.parse(localStorage.getItem('nakesData')) || [];
+
+    function handleHonorInput(el) {
+        let number = el.value.replace(/[^0-9]/g, '');
+        localStorage.setItem("totalHonorValue", number); // Simpan nilai bersih
+        el.value = new Intl.NumberFormat("id-ID").format(number);
+    }
+
+    function parseRupiah(str) {
+        return parseInt(str.replace(/\./g, '').replace(/[^0-9]/g, '')) || 0;
+    }
+
+    function getOrCreateID(nama) {
+        let idMap = JSON.parse(localStorage.getItem("idMap")) || {};
+        if (!idMap[nama]) {
+            idMap[nama] = "NK." + Date.now() + Math.floor(Math.random() * 1000);
+            localStorage.setItem("idMap", JSON.stringify(idMap));
+        }
+        return idMap[nama];
+    }
+
+    function tambahNakes() {
+        const div = document.createElement('div');
+        div.className = 'form-group';
+        div.innerHTML = `
+        <div>
+        <label> Fomulir Inputan Data :</label>
+        </div>
+        <div>
+            <label>*Nama Lengkap :</label>
+            <input type="text" placeholder="Nama Nakes" class="nama" required>
+        </div>
+        <div>
+            <label>*Pilih Jadwal Dinas :</label>
+            <select class="status" required>
+                <option value="" disabled selected>Pilih</option>
+                <option value="Pagi">Pagi</option>
+                <option value="Sore">Sore</option>
+                <option value="Malam">Malam</option>
+            </select>
+        </div>
+        <div>
+            <label>*Dari Pukul :</label>
+            <input type="time" class="dari" required>
+        </div>
+        <div>
+            <label>*Sampai Pukul :</label>
+            <input type="time" class="sampai" required>
+        </div>
+    `;
+        document.getElementById('formNakes').appendChild(div);
+    }
+
+    function hitungDurasi(jamAwal, jamAkhir) {
+        const [h1, m1] = jamAwal.split(":").map(Number);
+        const [h2, m2] = jamAkhir.split(":").map(Number);
+        let durasi = (h2 + m2 / 60) - (h1 + m1 / 60);
+        return durasi > 0 ? durasi : (24 + durasi);
+    }
+
+    function hitungHonor() {
+        document.getElementById("loading").style.display = "block";
+
+        setTimeout(() => {
+            const honorInput = document.getElementById("totalHonor");
+            let honorTotal = parseInt(honorInput.value.replace(/\D/g, "")) || 0;
+
+            // Simpan ke localStorage
+            localStorage.setItem("totalHonorValue", honorTotal);
+
+            // Kosongkan input total honor agar tidak muncul lagi di form
+            honorInput.value = "";
+
+            const namaEls = document.querySelectorAll(".nama");
+            const statusEls = document.querySelectorAll(".status");
+            const dariEls = document.querySelectorAll(".dari");
+            const sampaiEls = document.querySelectorAll(".sampai");
+            const tanggal = document.getElementById("tanggalHonor").value;
+
+            let totalJam = 0;
+            let tempData = [];
+
+            for (let i = 0; i < namaEls.length; i++) {
+                const nama = namaEls[i].value.trim();
+                const status = statusEls[i].value;
+                const dari = dariEls[i].value;
+                const sampai = sampaiEls[i].value;
+
+                if (!nama || !status || !dari || !sampai) continue;
+
+                const jam = hitungDurasi(dari, sampai);
+                totalJam += jam;
+
+                const id = getOrCreateID(nama); // Tetap pakai ID unik per nama
+                tempData.push({ id, nama, status, dari, sampai, jam, tanggal, honorTotal });
+            }
+
+            const editId = document.getElementById('formNakes').getAttribute("data-edit-id");
+
+            if (editId) {
+                const index = nakesData.findIndex(n => n.id === editId);
+                if (index !== -1) nakesData.splice(index, 1);
+                nakesData.push(...tempData);
+                document.getElementById('formNakes').removeAttribute("data-edit-id");
+                document.getElementById("batalEdit").style.display = "none";
+            } else {
+                nakesData = [...nakesData, ...tempData];
+            }
+
+            localStorage.setItem("nakesData", JSON.stringify(nakesData));
+            tampilkanData(nakesData);
+
+            // Tampilkan honor total di luar form sebagai ringkasan
+            document.getElementById("totalHonorText").innerText = `Rp ${honorTotal.toLocaleString("id-ID")}`;
+
+            document.getElementById("loading").style.display = "none";
+            alert("✅ Sukses, Terimakasih Fitri Widya Nengsih, Amd. Keb. Pembagian Insentif berhasil dihitung dan disimpan!");
+        }, 3000); // Tiga detik
+    }
+
+    function editNakes(index) {
+        const n = nakesData[index];
+        const form = document.getElementById("formNakes");
+        form.innerHTML = "";
+        tambahNakes();
+
+        const inputs = form.querySelectorAll("input, select");
+        inputs[0].value = n.nama;
+        inputs[1].value = n.status;
+        inputs[2].value = n.dari;
+        inputs[3].value = n.sampai;
+
+        document.getElementById("tanggalHonor").value = n.tanggal || "";
+        document.getElementById("totalHonor").value = new Intl.NumberFormat("id-ID").format(n.honorTotal || 0);
+        localStorage.setItem("totalHonorValue", n.honorTotal); // Simpan ulang ke localStorage
+
+        form.setAttribute("data-edit-id", n.id);
+        document.getElementById("batalEdit").style.display = "inline-block";
+    }
+
+    function batalEdit() {
+        document.getElementById('formNakes').removeAttribute("data-edit-id");
+        document.getElementById("formNakes").innerHTML = "";
+        tambahNakes();
+        document.getElementById("batalEdit").style.display = "none";
+    }
+
+    function hapusNakes(index) {
+        if (confirm("Yakin ingin menghapus data ini?")) {
+            nakesData.splice(index, 1);
+            localStorage.setItem("nakesData", JSON.stringify(nakesData));
+            filterBulanTahun();
+        }
+    }
+
+    function filterBulanTahun() {
+        const bulan = document.getElementById("filterBulan").value;
+        const tahun = document.getElementById("filterTahun").value;
+
+        const hasil = nakesData.filter(n => {
+            const [y, m] = n.tanggal.split("-");
+            return (!bulan || m === bulan) && (!tahun || y === tahun);
+        });
+
+        tampilkanData(hasil);
+    }
+
+    function tampilkanData(data) {
+        let tbody = document.querySelector("#hasilTable tbody");
+        tbody.innerHTML = "";
+
+        const totalHonor = parseInt(localStorage.getItem("totalHonorValue")) || 0;
+        let totalJam = data.reduce((sum, n) => sum + n.jam, 0);
+
+        if (data.length === 0) {
+            document.getElementById("hasilTable").style.display = "none";
+            document.getElementById("totalHonorText").innerText = "Rp0";
+            // Sembunyikan paragraf total honor juga
+            document.getElementById("totalHonorText").parentElement.style.display = "none";
+            return; // keluar dari fungsi agar tidak lanjut render tabel
+        } else {
+            document.getElementById("hasilTable").style.display = "table";
+            // Tampilkan paragraf total honor jika ada data
+            document.getElementById("totalHonorText").parentElement.style.display = "block";
+        }
+
+        data.forEach((n, idx) => {
+            let persen = (n.jam / totalJam) * 100;
+            let honor = Math.round((n.jam / totalJam) * totalHonor);
+
+            tbody.innerHTML += `
+            <tr>
+                <td>${idx + 1}</td>
+                <td>${n.id}</td>
+                <td>${n.nama}</td>
+                <td>${n.status}</td>
+                <td>${n.dari}</td>
+                <td>${n.sampai}</td>
+                <td>${n.jam.toFixed(2)}</td>
+                <td>${persen.toFixed(2)}%</td>
+                <td>Rp ${honor.toLocaleString("id-ID")}</td>
+                <td>${n.tanggal}</td>
+                <td>
+                   <button class="btn-small" onclick="editNakes(${idx})"><i class="fas fa-edit"></i> Edit</button>
+                   <button class="btn-small" onclick="hapusNakes(${idx})"><i class="fas fa-trash-alt"></i> Hapus</button>
+
+                </td>
+            </tr>
+        `;
+        });
+
+        document.getElementById("totalHonorText").innerText = `Rp ${totalHonor.toLocaleString("id-ID")}`;
+    }
+
+    window.onload = () => {
+        const savedHonor = localStorage.getItem("totalHonorValue");
+        if (savedHonor) {
+            // Jangan tampilkan lagi di input form
+            document.getElementById("totalHonor").value = ""; // dikosongkan
+            document.getElementById("totalHonorText").innerText = `Rp ${parseInt(savedHonor).toLocaleString("id-ID")}`;
+        }
+
+        tambahNakes();
+        if (nakesData.length > 0) {
+            tampilkanData(nakesData);
+        }
+    };
+
+    async function eksporPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const columns = ["No", "ID", "Nama", "Status", "Dari", "Sampai", "Jam", "Persen", "Honor", "Tanggal"];
+        const rows = [];
+
+        const totalHonor = parseInt(localStorage.getItem("totalHonorValue")) || 0;
+        let totalJam = nakesData.reduce((sum, n) => sum + n.jam, 0);
+
+        nakesData.forEach((n, idx) => {
+            let persen = (n.jam / totalJam) * 100;
+            let honor = Math.round((n.jam / totalJam) * totalHonor);
+            rows.push([
+                idx + 1,
+                n.id,
+                n.nama,
+                n.status,
+                n.dari,
+                n.sampai,
+                n.jam.toFixed(2),
+                persen.toFixed(2) + "%",
+                "Rp " + honor.toLocaleString("id-ID"),
+                n.tanggal
+            ]);
+        });
+
+        doc.text("Data Pembagian Honor Nakes RSUD Tais", 14, 15);
+        doc.autoTable({
+            head: [columns],
+            body: rows,
+            startY: 20,
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [41, 128, 185] }
+        });
+
+        doc.save("data_honor_nakes.pdf");
+    }
+
+    function eksporExcel() {
+        const headers = ["No", "ID", "Nama", "Status", "Dari", "Sampai", "Jam", "Persen", "Honor", "Tanggal"];
+        const totalHonor = parseInt(localStorage.getItem("totalHonorValue")) || 0;
+        let totalJam = nakesData.reduce((sum, n) => sum + n.jam, 0);
+
+        const rows = nakesData.map((n, idx) => {
+            let persen = (n.jam / totalJam) * 100;
+            let honor = Math.round((n.jam / totalJam) * totalHonor);
+            return [
+                idx + 1,
+                n.id,
+                n.nama,
+                n.status,
+                n.dari,
+                n.sampai,
+                n.jam.toFixed(2),
+                persen.toFixed(2) + "%",
+                honor,
+                n.tanggal
+            ].join(",");
+        });
+
+        const csvContent = [headers.join(","), ...rows].join("\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "data_honor_nakes.csv");
+        link.style.visibility = "hidden";
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+</body>
+
+</html>
